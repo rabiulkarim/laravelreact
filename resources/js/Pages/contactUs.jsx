@@ -1,33 +1,53 @@
-import MainLayout from '@/Layouts/MainLayout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import TextInput from '@/Components/TextInput';
-import { Head, useForm } from '@inertiajs/react';
+import MainLayout from "@/Layouts/MainLayout";
+import { Head } from "@inertiajs/react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
-// route('contactMail') use for contact form Sumit 
-// Post Method 
+// route('contactMail') use for contact form Sumit
+// Post Method
 
-export default function contactUs({page}) {
+export default function contactUs({ page }) {
+    const [successMsg, setSuccessMsg] = useState("");
 
-    const { data, setData, errors } = useForm({
-        name: '',
-        email: '',
-    });
+    const {
+        register,
+        formState: { errors },
+        handleSubmit,
+    } = useForm();
 
-    const submit = (e) => {
+    const submit = (data, e) => {
         e.preventDefault();
+        const form = e.target;
+        const contactMailData = data;
 
-        post(route('contactMail'));
+        console.log(contactMailData);
+
+        setSuccessMsg("Successfull Data Submited");
+
+        // post(route('contactMail'));
+
+        form.reset();
     };
-    
-    const canonicalLink = page && page.slug ? route('pageView', page.slug) : route('pageView', 'no-title');
+
+    const canonicalLink =
+        page && page.slug
+            ? route("pageView", page.slug)
+            : route("pageView", "no-title");
     return (
         <MainLayout>
             <Head>
                 <title>{page.name}</title>
-                <meta name="title" property="og:title" content={page.name}/>
-                <meta name="description" property="og:description" content="Thi si meta description Text" />
-                <meta name="keyword" property="og:keyword" content="This is mete keyword text" />
+                <meta name="title" property="og:title" content={page.name} />
+                <meta
+                    name="description"
+                    property="og:description"
+                    content="Thi si meta description Text"
+                />
+                <meta
+                    name="keyword"
+                    property="og:keyword"
+                    content="This is mete keyword text"
+                />
                 <meta name="image" property="og:image" content="this is logo" />
                 <meta name="url" property="og:url" content={canonicalLink} />
                 <link rel="canonical" href={canonicalLink} />
@@ -36,46 +56,109 @@ export default function contactUs({page}) {
                 <div className="container">
                     <div className="row">
                         <div className="col-12 col-md-6 col-lg-5 offset-lg-1 py-8 py-md-11 py-lg-12">
-                            <form onSubmit={submit}  >
+                            {successMsg === "" ? null : (
+                                <p className="text-green-500 text-center">
+                                    {successMsg}
+                                </p>
+                            )}
+
+                            <form onSubmit={handleSubmit(submit)}>
                                 <div className="mb-3">
-                                    <InputLabel htmlFor="name" value="Name" />
-                                    <TextInput
-                                        id="name"
-                                        className="mt-1 block w-full"
-                                        value={data.name}
-                                        onChange={(e) => setData('name', e.target.value)}
-                                        required
-                                        isFocused
-                                        autoComplete="name"
+                                    <label>Name</label>
+                                    <input
+                                        className="form-control"
+                                        name="name"
+                                        placeholder="Enter Your Email"
+                                        {...register("name", {
+                                            required: "Name is reqrired",
+                                            maxLength: {
+                                                value: 100,
+                                                message:
+                                                    "Your name must be at max number 100 characters",
+                                            },
+                                        })}
                                     />
-                                    <InputError className="mt-2" message={errors.email} />
+                                    {errors.name && (
+                                        <p
+                                            role="alert"
+                                            style={{ color: "red" }}
+                                        >
+                                            {errors.name.message}
+                                        </p>
+                                    )}
                                 </div>
                                 <div className="mb-3">
                                     <label>Email</label>
                                     <input
-                                        type="email"
                                         className="form-control"
                                         name="email"
                                         placeholder="Enter Your Email"
+                                        {...register("email", {
+                                            required:
+                                                "Email Address is required",
+                                            pattern: {
+                                                value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                                                message:
+                                                    "Invalid email address",
+                                            },
+                                        })}
                                     />
+                                    {errors.email && (
+                                        <p
+                                            role="alert"
+                                            style={{ color: "red" }}
+                                        >
+                                            {errors.email.message}
+                                        </p>
+                                    )}
                                 </div>
                                 <div className="mb-3">
                                     <label>Subject</label>
                                     <input
-                                        type="text"
                                         className="form-control"
                                         name="subject"
                                         placeholder="Enter Subject"
+                                        {...register("subject", {
+                                            required: "subject is reqrired",
+                                            maxLength: {
+                                                value: 100,
+                                                message:
+                                                    "Your name must be at max number 100 characters",
+                                            },
+                                        })}
                                     />
+                                    {errors.subject && (
+                                        <p
+                                            role="alert"
+                                            style={{ color: "red" }}
+                                        >
+                                            {errors.subject.message}
+                                        </p>
+                                    )}
                                 </div>
                                 <div className="mb-3">
                                     <label>Message</label>
                                     <textarea
-                                        type="text"
                                         className="form-control"
                                         name="message"
                                         placeholder="Enter Write Message"
+                                        {...register("message", {
+                                            required: "message is reqrired",
+                                            maxLength: {
+                                                value: 100,
+                                                message:
+                                                    "Your name must be at max number 100 characters",
+                                            },
+                                        })}
                                     ></textarea>
+                                    {errors.message && (
+                                        <p
+                                            role="alert"
+                                            style={{ color: "red" }}
+                                        >
+                                            {errors.message.message}
+                                        </p>
+                                    )}
                                 </div>
                                 <button
                                     type="submit"
